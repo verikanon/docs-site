@@ -1,6 +1,6 @@
 site:
-  title: Minato Lab
-  start_page: minato-lab::index.adoc
+  title: Andrew Lab
+  start_page: andrew-lab::index.adoc
 
 content:
   sources:

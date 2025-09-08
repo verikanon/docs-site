@@ -1,5 +1,5 @@
-name: minato-lab
+name: andrew-lab
 version: ~
-title: Minato Lab
+title: Andrew Lab
 nav:
 - modules/ROOT/nav.adoc
