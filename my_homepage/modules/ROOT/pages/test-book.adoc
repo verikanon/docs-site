@@ -1,0 +1,12 @@
+= Hellow World.
+
+file:///home/kanontanabe/docs-site/my_homepage/build/site
+
+[.text-right]
+投稿日：{postdate} &#160;&#160;&#160;&#160; 最終更新日：{revdate}
+
+こんにちはさたさん
+
+これはテストです。
+
+お金が欲しい
