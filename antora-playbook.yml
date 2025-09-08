@@ -1,6 +1,6 @@
 site:
   title: Minato Lab
-  start_page: my_homepage::test-book.adoc
+  start_page: minato-lab::index.adoc
 
 content:
   sources:
