@@ -1,13 +1,17 @@
-isite:
+site:
   title: Minato Lab
-  start_page: minato-lab::README.adoc
+  start_page: my_homepage::test-book.adoc
+
 content:
   sources:
-  - url: .
-    start_path: my_homepage
-    branches: HEAD
+    - url: .
+      start_path: my_homepage
+      branches: HEAD
+
 ui:
   bundle:
     url: https://gitlab.com/antora/antora-ui-default/-/jobs/artifacts/HEAD/raw/build/ui-bundle.zip?job=bundle-stable
     snapshot: true
 
+output:
+  dir: public
