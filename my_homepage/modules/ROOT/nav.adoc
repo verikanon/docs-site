@@ -1,4 +1,3 @@
-* xref:test-book.adoc[Test]
 * xref:rirekisyo.adoc[Rirekisyo]
 * xref:rirekisyo2.adoc[Rirekisyo2]
 * xref:recipiGtoA.adoc[レバニラGtoA]
