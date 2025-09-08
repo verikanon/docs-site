@@ -1,0 +1,24 @@
+/* ヘッダー色と文字色 */
+.navbar { background: #0f172a; }           /* 濃紺 */
+.navbar a, .navbar .navbar-item { color: #e5e7eb; }
+
+/* ホバー時 */
+.navbar a:hover, .navbar .navbar-item:hover { color: #ffffff; }
+
+/* サイドナビの見出しとリンク色 */
+.nav .nav-list .nav-item .nav-link { color: #334155; }
+.nav .nav-list .nav-item .nav-link:hover { color: #0f172a; }
+
+/* 本文フォント（読みやすいSans系に） */
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans JP", "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", Meiryo, sans-serif; }
+
+/* 見出しを少し太く */
+h1, h2, h3 { font-weight: 700; }
+
+/* リンク色 */
+a { color: #2563eb; }              /* ブルー */
+a:hover { text-decoration: underline; }
+
+/* コードブロックを少し締める */
+pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+pre { padding: .8rem; border-radius: .5rem; }
