@@ -1,47 +1,47 @@
-
-name: Publish to GitHub Pages
+name: Publish Antora site
 on:
   push:
-    branches: [main]
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-concurrency:
-  group: github-pages
-  cancel-in-progress: false
-
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-
-
-[.text-right]
-投稿日：{postdate} &#160;&#160;&#160;&#160; 最終更新日：{revdate}
+    branches: [ main ]
 
 permissions:
   contents: read
   pages: write
   id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
 jobs:
   build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Antora
+        run: npm install -g @antora/cli @antora/site-generator
+
+      - name: Build Antora site
+        run: antora antora-playbook.yml
+
+      - name: Upload artifact (site)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    - name: Configure Pages
-      uses: actions/configure-pages@v5
-    - name: Install Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-    - name: Install Antora
-      run: npm i antora
-    - name: Generate Site
-      run: npx antora antora-playbook.yml
-    - name: Upload Artifacts
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: build/site
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
