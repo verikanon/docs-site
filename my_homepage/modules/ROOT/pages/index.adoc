@@ -5,7 +5,7 @@
 
 [.lead]
 Andrew Lab へようこそ  
-わたくしはピカチュウがすきです　　
+わたくしはピカチュウがすきです  
 欲しいものはお金です  
 チャッピーに爽快感のある勧善懲悪系のおすすめアクション映画は？と聞いてジョン・ウィックを見ました。激おこです
 
@@ -13,7 +13,7 @@ Andrew Lab へようこそ
 * 🧪 xref:cell.adoc[Cell 実験メモ（随時更新）]
 * 📝 xref:rirekisyo.adoc[履歴書（研究経歴）] ・ xref:rirekisyo2.adoc[英語版]
 * 🍳 xref:recipiGtoA.adoc[レバニラ G→A レシピ] ・ xref:recipiGtoMtoA.adoc[G→M→A 派生]
-* 📚 xref:test-book.adoc[試し読みノート（Test Book）]
+* 📚 xref:fortune.adoc[今日の占い（整備中）]
 
 [NOTE]
 ====
@@ -37,7 +37,7 @@ Andrew Lab へようこそ
 
 === 読書メモの書き方
 - 白背景に赤文字はまぶしい！（林田）
-- xref:test-book.adoc[試し読みノート]にテンプレあり。
+- 見えない。その色見えない。なんて書いてあるの（林田）
 
 == ミニギャラリー
 [cols="1,1,1", frame=none, grid=none]
