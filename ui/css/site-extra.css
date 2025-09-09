@@ -123,3 +123,12 @@ pre, code{
 /* ハンバーガー(モバイル)の線色 */
 .burger span{ background: var(--nav-fg); }
 
+/* === fix: header overlap === */
+:root{ --header-h: 56px; }  /* まだ被るなら 64px に上げてもOK */
+
+.nav{ top: var(--header-h) !important; }
+.toolbar{ top: var(--header-h) !important; }
+
+/* スクロール先もヘッダー分ずらす（目次/見出しジャンプ用） */
+html{ scroll-padding-top: var(--header-h); }
+
