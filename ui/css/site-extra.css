@@ -23,3 +23,9 @@ a:hover { text-decoration: underline; }
 pre, code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
 pre { padding: .8rem; border-radius: .5rem; }
 body { outline: 4px solid magenta !important; }
+
+/* debug: 反映確認用 */
+* { outline: 3px solid dodgerblue !important; }
+.navbar { background: #111827 !important; } /* ヘッダーを濃いグレーに */
+.navbar-brand, .navbar .navbar-item { color: #fff !important; } /* 文字を白に */
+
