@@ -1,0 +1,384 @@
+= きょうの占い（超凝った版）
+:description: ランダム生成・重み付き・カテゴリ別メッセージ・ラッキー情報・画像生成つき
+:page-toclevels: 1
+
+++++
+<style>
+  /* ===== スタイル（#fortune-app 配下に限定） ===== */
+  #fortune-app{--bg:#fff8ef;--ink:#222;--accent:#b91c1c;--ink-2:#444;--muted:#7a7a7a;--ring:rgba(185,28,28,.22);--card:#fff;--line:#eee}
+  #fortune-app{font-family: "M PLUS Rounded 1c", "Noto Sans JP", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif}
+  #fortune-app .wrap{background:linear-gradient(180deg,#fffaf2 0%,#fff 40%,#fff 100%);border:1px solid #eee;border-radius:18px;padding:18px;box-shadow:0 14px 40px rgba(0,0,0,.07)}
+  #fortune-app .head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+  #fortune-app .logo{width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800;box-shadow:0 8px 20px rgba(185,28,28,.25)}
+  #fortune-app .title{margin:0;font-size:clamp(18px,3.6vw,24px)}
+  #fortune-app .subtitle{margin:0;color:var(--muted);font-size:13px}
+
+  #fortune-app .controls{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}
+  #fortune-app button{appearance:none;cursor:pointer;border:1px solid #ddd;background:#fff;padding:9px 13px;border-radius:12px;font-weight:700;transition:.12s}
+  #fortune-app button:hover{box-shadow:0 6px 14px rgba(0,0,0,.06)}
+  #fortune-app .btn-primary{background:var(--accent);color:#fff;border-color:transparent}
+  #fortune-app .btn-primary:hover{box-shadow:0 8px 18px rgba(185,28,28,.25)}
+  #fortune-app .switch{display:flex;align-items:center;gap:8px;font-size:13px;color:#333}
+  #fortune-app .select{padding:8px 10px;border-radius:10px;border:1px solid #ddd;background:#fff}
+
+  #fortune-app .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+  @media (max-width: 820px){#fortune-app .grid{grid-template-columns:1fr;}}
+  #fortune-app .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;position:relative;overflow:hidden}
+  #fortune-app .badge{display:inline-grid;place-items:center;height:26px;min-width:26px;padding:0 8px;border-radius:999px;background:#fef2f2;color:var(--accent);border:1px solid #fee2e2;font-size:12px;font-weight:800}
+  #fortune-app .rank{font-weight:900;font-size:clamp(24px,6vw,36px);letter-spacing:.04em}
+  #fortune-app .rank small{font-size:12px;color:var(--muted);font-weight:600;margin-left:8px}
+  #fortune-app .msg{margin-top:8px;font-size:clamp(18px,4.6vw,22px);line-height:1.7}
+  #fortune-app .msg .k{display:inline-block;background:linear-gradient(transparent 68%, rgba(185,28,28,.15) 0)}
+  #fortune-app .topic{margin-top:14px;display:grid;gap:8px}
+  #fortune-app .topic .row{display:grid;grid-template-columns:110px 1fr;gap:8px;align-items:start}
+  #fortune-app .topic .row .label{color:#555;font-weight:700}
+  #fortune-app .topic .row .value{color:#1a1a1a}
+  #fortune-app .sep{height:1px;background:linear-gradient(90deg,transparent, #eee, transparent);margin:14px 0}
+
+  #fortune-app .side h3{margin:4px 0 8px 0;font-size:14px;color:#333}
+  #fortune-app .pill{display:inline-grid;place-items:center;background:#fafafa;border:1px solid #eee;border-radius:10px;padding:6px 10px;font-size:13px}
+  #fortune-app .list{display:grid;gap:8px}
+  #fortune-app .kv{display:flex;align-items:center;gap:8px}
+  #fortune-app .swatch{width:18px;height:18px;border-radius:6px;border:1px solid rgba(0,0,0,.1)}
+  #fortune-app .note{color:#777;font-size:12px;margin-top:6px}
+  #fortune-app .history{max-height:160px;overflow:auto;display:grid;gap:6px}
+  #fortune-app .history-item{font-size:13px;color:#222}
+  #fortune-app .center{display:grid;place-items:center}
+  #fortune-app canvas{width:100%;border-radius:14px;border:1px solid #eee}
+
+  /* reveal 演出 */
+  #fortune-app .reveal{position:absolute;inset:0;background:radial-gradient(1200px 300px at 50% -10%,rgba(185,28,28,.1),transparent 60%);pointer-events:none;opacity:0;animation:reveal .7s ease}
+  @keyframes reveal{from{opacity:1;transform:translateY(-6px)}to{opacity:0;transform:translateY(0)}}
+</style>
+
+<div id="fortune-app">
+  <div class="wrap">
+    <div class="head">
+      <div class="logo" aria-hidden>吉</div>
+      <div>
+        <h2 class="title">きょうの占い（超凝った版）</h2>
+        <p class="subtitle">重み付きの運勢＋カテゴリ別メッセージ／ラッキー情報／画像生成・共有付き</p>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="roll" class="btn-primary">おみくじを引く</button>
+      <button id="share" title="X/Twitterで共有">共有</button>
+      <button id="copy" title="テキストをコピー">コピー</button>
+      <select id="cat" class="select" title="重点カテゴリ">
+        <option value="auto">カテゴリ自動</option>
+        <option value="love">恋愛</option>
+        <option value="work">仕事</option>
+        <option value="money">金運</option>
+        <option value="health">健康</option>
+        <option value="study">学び</option>
+      </select>
+      <label class="switch"><input id="daily" type="checkbox" checked> きょう固定（日付シード）</label>
+      <label class="switch"><input id="norepeat" type="checkbox" checked> 同じ結果を避ける</label>
+    </div>
+
+    <div class="grid">
+      <section class="card main">
+        <div class="reveal" hidden></div>
+        <div class="badge" id="stamp">NEW</div>
+        <div class="rank" id="rank">—</div>
+        <div class="msg" id="line">ボタンを押してね</div>
+
+        <div class="topic">
+          <div class="row"><div class="label">恋愛</div><div class="value" id="t-love">—</div></div>
+          <div class="row"><div class="label">仕事</div><div class="value" id="t-work">—</div></div>
+          <div class="row"><div class="label">金運</div><div class="value" id="t-money">—</div></div>
+          <div class="row"><div class="label">健康</div><div class="value" id="t-health">—</div></div>
+          <div class="row"><div class="label">学び</div><div class="value" id="t-study">—</div></div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="topic">
+          <div class="row"><div class="label">ラッキーカラー</div><div class="value kv"><span class="swatch" id="sw"></span><span id="lc">—</span></div></div>
+          <div class="row"><div class="label">ラッキーアイテム</div><div class="value" id="li">—</div></div>
+          <div class="row"><div class="label">ラッキーナンバー</div><div class="value" id="ln">—</div></div>
+          <div class="row"><div class="label">運命数</div><div class="value" id="life">— <span class="note">（今日の日付から算出）</span></div></div>
+        </div>
+      </section>
+
+      <aside class="card side">
+        <h3>履歴</h3>
+        <div class="history" id="hist"></div>
+        <div class="sep"></div>
+        <div class="list">
+          <button id="saveimg">カード画像を生成</button>
+          <a id="download" class="pill" href="#" download="fortune-card.png" hidden>画像をダウンロード</a>
+          <p class="note">※ 画像はこのページ内だけで生成。外部送信なし。</p>
+        </div>
+        <div class="sep"></div>
+        <div class="center">
+          <canvas id="card" width="1200" height="630" aria-label="シェア用カード（プレビュー）"></canvas>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== 設定（ここだけ弄れば文言や確率を調整できます） ===== */
+
+// 運勢の重み（合計100にしなくてもOK）
+const RANKS = [
+  { key: "大吉", weight: 5,  note: "うら～ないでおも～てなし" },
+  { key: "中吉", weight: 18, note: "大日本赤斑吸血角虫だ！！！" },
+  { key: "小吉", weight: 24, note: "おじい様に代わって、成敗" },
+  { key: "吉",   weight: 30, note: "なぜベストを尽くさないのか" },
+  { key: "末吉", weight: 13, note: "どんとこい超常現象" },
+  { key: "凶",   weight: 8,  note: "お前たちのやったことは、全部マルっとスリットお見通しだ" },
+  { key: "大凶", weight: 2,  note: "以上、矢部謙三でした" },
+];
+
+// 全体のセリフ（ランダム1本）
+const LINES = [
+  "『<span class='k'>僕は東大を出ています</span>。』",
+  "『<span class='k'>もえ～～～～</span>。』",
+  "『<span class='k'>流石は兄貴</span>じゃけえのお！。』",
+  "『文字には<span class='k'>不思議な力が</span>あります。』",
+  "『私には超能力があります』",
+  "『貧乳禁止』",
+  "『人生の勝利者たち』",
+];
+
+// カテゴリ別メッセージ（各1本ずつ）
+const TOPICS = {
+  love: [
+    "大切なのは『心』をつける事。心づけ…お心づけ…",
+    "アイシテイマスタカラハイラナイ",
+    "３０年前の犯人まだ庇うか！",
+    "スリッスリッスリッ！！スリット！！！！"
+  ],
+  work: [
+    "どんな人気者も、栄光の日々はいつか終わる。だが私は違う",
+    "己の欲望を捨て、私にもっと旨いものをおごれ",
+    "I CAN BE AL",
+    "よし、わかった！犯人はお前や！！"
+  ],
+  money: [
+    "あなたは黄色い紙を選ぶ",
+    "明日の来ない日はあっても、家賃の来ない日は無い",
+    "私は知っている、本物の霊能力者を。",
+    "御手洗ちかお君を励ます会"
+  ],
+  health: [
+    "これはね、頭から直に生えてるもんなんで…",
+    "そうだよ。おじさんはインチキだからね",
+    "溺れる者は藁をもつかむ",
+    "どこまでも手のかかることを！"
+  ],
+  study: [
+    "私に言わせれば すべてのホラー現象はホラに過ぎない",
+    "犯人は……この中におる",
+    "３０年前の犯人まだ庇うか!",
+    "おいしそう、ひとつくれ"
+  ],
+};
+
+// ラッキー情報
+const LUCKY_COLORS = [
+  ["茜色", "#b91c1c"], ["藍色", "#274060"], ["若草", "#86b049"],
+  ["江戸紫", "#6a3d79"], ["水色", "#73c2fb"], ["薄紅", "#f2a2a2"],
+  ["琥珀", "#c38e36"], ["黒曜", "#222222"], ["刈安", "#e5d36c"]
+];
+const LUCKY_ITEMS = [
+  "パンチ", "パーマ", "亀一", "亀二", "次郎号", "次郎君人形",
+  "うにゃにゅぺぇぎゅうりゅ星人", "象の像", "ガッツ石まっ虫", "ペイズリーの涙"
+];
+const EMOJIS = ["✨","🌸","🗻","🦊","🎋","🎯","🧧","🍵","📚","💡"];
+
+/* ===== 小道具 ===== */
+const $ = (s)=>document.querySelector(s);
+const $all = (s)=>Array.from(document.querySelectorAll(s));
+const state = { lastKey: "", history: [] };
+
+function hashStr(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h+= (h<<1)+(h<<4)+(h<<7)+(h<<8)+(h<<24);} return h>>>0; }
+function mulberry32(a){ return function(){ let t=a+=0x6D2B79F5; t=Math.imul(t^t>>>15,1|t); t^=t+Math.imul(t^t>>>7,61|t); return ((t^t>>>14)>>>0)/4294967296; } }
+function dailySeed(){ const d=new Date(); const key=`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; return hashStr(key); }
+function pickWeighted(rng, list){
+  const sum = list.reduce((a,b)=>a+b.weight,0);
+  let r = rng()*sum;
+  for(const it of list){ if((r-=it.weight) < 0) return it; }
+  return list[list.length-1];
+}
+function pick(rng, arr){ return arr[Math.floor(rng()*arr.length)] }
+function lifeNumberFromDate(){
+  const d = new Date(); const s = `${d.getFullYear()}${(d.getMonth()+1)}${d.getDate()}`;
+  let n = s.split("").map(Number).reduce((a,b)=>a+b,0);
+  while(n > 9) n = String(n).split("").map(Number).reduce((a,b)=>a+b,0);
+  return n;
+}
+function animateReveal(){ const el=$(".reveal"); el.hidden=false; el.addEventListener("animationend",()=>el.hidden=true,{once:true}); }
+
+/* ===== メイン ===== */
+function roll(){
+  const daily = $("#daily").checked;
+  const norepeat = $("#norepeat").checked;
+  const cat = $("#cat").value;
+
+  const rng = daily ? mulberry32(dailySeed()) : Math.random;
+  const rank = pickWeighted(rng, RANKS);
+  const line = pick(rng, LINES);
+
+  // カテゴリ選択
+  const topics = {...TOPICS};
+  const choose = (k)=> pick(rng, topics[k]);
+
+  const chosen = {
+    love: cat==="love"  ? choose("love")  : choose("love"),
+    work: cat==="work"  ? choose("work")  : choose("work"),
+    money:cat==="money" ? choose("money") : choose("money"),
+    health:cat==="health"? choose("health"): choose("health"),
+    study:cat==="study" ? choose("study") : choose("study"),
+  };
+
+  const [cname, chex] = pick(rng, LUCKY_COLORS);
+  const item = pick(rng, LUCKY_ITEMS);
+  const ln = 1 + Math.floor(rng()*9);
+  const life = lifeNumberFromDate();
+  const key = `${rank.key}|${line}|${cname}|${item}|${ln}|${Object.values(chosen).join("|")}`;
+
+  if(norepeat && state.lastKey === key){
+    // かぶり回避（最大5回試行）
+    for(let i=0;i<5;i++){
+      const retry = roll(); // 再帰で引き直し
+      if(retry !== false) return retry;
+    }
+  }
+
+  // 表示
+  $("#rank").innerHTML = `${rank.key} <small>${rank.note}</small>`;
+  $("#line").innerHTML = line;
+  $("#t-love").textContent = chosen.love;
+  $("#t-work").textContent = chosen.work;
+  $("#t-money").textContent = chosen.money;
+  $("#t-health").textContent = chosen.health;
+  $("#t-study").textContent = chosen.study;
+  $("#lc").textContent = `${cname}（${chex}）`; $("#sw").style.background = chex;
+  $("#li").textContent = item;
+  $("#ln").textContent = `${ln} ${pick(Math.random, EMOJIS)}`;
+  $("#life").textContent = life;
+
+  // 履歴
+  const summary = `${rank.key}｜${stripHtml(line)}｜${cname}｜${item}｜#${ln}`;
+  state.history.unshift(summary);
+  if(state.history.length>12) state.history.pop();
+  $("#hist").innerHTML = state.history.map((s,i)=>`<div class="history-item">${i+1}. ${escapeHtml(s)}</div>`).join("");
+
+  // カード描画
+  drawCard({rank:rank.key, note:rank.note, line:stripHtml(line), color:[cname,chex], item, ln, life, chosen});
+
+  state.lastKey = key;
+  $("#stamp").textContent = "NEW";
+  animateReveal();
+  return true;
+}
+
+function stripHtml(s){ const t=document.createElement("div"); t.innerHTML=s; return t.textContent || s; }
+function escapeHtml(s){ return s.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;"); }
+
+/* ===== 共有・コピー ===== */
+$("#share").addEventListener("click", ()=>{
+  const text = buildShareText();
+  const url = new URL("https://twitter.com/intent/tweet");
+  url.searchParams.set("text", text + " #きょうの占い");
+  window.open(url.toString(), "_blank");
+});
+$("#copy").addEventListener("click", async ()=>{
+  try{ await navigator.clipboard.writeText(buildShareText()); $("#copy").textContent="コピー済"; setTimeout(()=>$("#copy").textContent="コピー",900);}catch{}
+});
+function buildShareText(){
+  const r = $("#rank").textContent.trim();
+  const line = stripHtml($("#line").innerHTML.trim());
+  const color = $("#lc").textContent.trim();
+  const item = $("#li").textContent.trim();
+  const ln = $("#ln").textContent.trim();
+  return `今日の運勢：${r}\n${line}\nラッキー：${color}／${item}／番号${ln}`;
+}
+
+/* ===== 画像（Canvas）生成 ===== */
+function drawCard(data){
+  const c = $("#card"); const ctx = c.getContext("2d");
+  // 背景
+  const g = ctx.createLinearGradient(0,0,0,c.height);
+  g.addColorStop(0,"#fff3e0"); g.addColorStop(1,"#ffffff");
+  ctx.fillStyle = g; ctx.fillRect(0,0,c.width,c.height);
+
+  // 装飾
+  ctx.fillStyle = "rgba(185,28,28,.08)";
+  ctx.beginPath(); ctx.ellipse(1050,120, 180,70, 0, 0, Math.PI*2); ctx.fill();
+
+  // タイトル
+  ctx.fillStyle = "#b91c1c";
+  ctx.font = "bold 44px 'Noto Sans JP', system-ui";
+  ctx.fillText("きょうの占い", 60, 90);
+
+  // ランク
+  ctx.fillStyle = "#111";
+  ctx.font = "800 68px 'Noto Sans JP', system-ui";
+  ctx.fillText(data.rank, 60, 170);
+  ctx.fillStyle = "#b91c1c";
+  ctx.font = "600 22px 'Noto Sans JP', system-ui";
+  ctx.fillText(data.note, 60 + ctx.measureText(data.rank).width + 22, 170);
+
+  // メイン台詞
+  ctx.fillStyle = "#222";
+  wrapText(ctx, `“ ${data.line} ”`, 60, 230, 1080, 38, "600 30px 'Noto Serif JP', serif");
+
+  // テーマ
+  ctx.font = "700 22px 'Noto Sans JP', system-ui";
+  ctx.fillStyle = "#333"; ctx.fillText("恋愛",60, 340); ctx.fillText("仕事",60, 380);
+  ctx.fillText("金運",60, 420); ctx.fillText("健康",60, 460); ctx.fillText("学び",60, 500);
+  ctx.font = "400 22px 'Noto Sans JP', system-ui"; ctx.fillStyle = "#111";
+  ctx.fillText(data.chosen.love, 120, 340);
+  ctx.fillText(data.chosen.work, 120, 380);
+  ctx.fillText(data.chosen.money,120, 420);
+  ctx.fillText(data.chosen.health,120, 460);
+  ctx.fillText(data.chosen.study,120, 500);
+
+  // ラッキー
+  ctx.font = "700 22px 'Noto Sans JP', system-ui"; ctx.fillStyle = "#333";
+  ctx.fillText("ラッキーカラー", 60, 560);
+  ctx.fillText("ラッキーアイテム", 60, 600);
+  ctx.fillText("ラッキーナンバー", 60, 640);
+  // swatch
+  ctx.fillStyle = data.color[1]; ctx.fillRect(220, 548, 26, 26); ctx.strokeStyle="#ddd"; ctx.strokeRect(220,548,26,26);
+  ctx.fillStyle = "#111"; ctx.font = "400 22px 'Noto Sans JP', system-ui";
+  ctx.fillText(`${data.color[0]}（${data.color[1]}）`, 260, 568);
+  ctx.fillText(data.item, 220, 600);
+  ctx.fillText(String(data.ln), 220, 640);
+
+  // 運命数
+  ctx.fillStyle = "#333"; ctx.font = "700 22px 'Noto Sans JP', system-ui";
+  ctx.fillText("運命数", 820, 560);
+  ctx.fillStyle = "#111"; ctx.font = "800 76px 'Noto Sans JP', system-ui";
+  ctx.fillText(String(data.life), 920, 615);
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight, font){
+  ctx.font = font; ctx.textBaseline="top";
+  const words = text.split(/\s+/); let line = ""; let yy = y;
+  for (let i=0;i<words.length;i++){
+    const testLine = line + words[i] + " ";
+    if (ctx.measureText(testLine).width > maxWidth && i>0){
+      ctx.fillText(line, x, yy); line = words[i] + " "; yy += lineHeight;
+    } else { line = testLine; }
+  }
+  ctx.fillText(line, x, yy);
+}
+
+$("#saveimg").addEventListener("click", ()=>{
+  const a = $("#download"); a.href = $("#card").toDataURL("image/png"); a.hidden = false;
+  a.textContent = "画像をダウンロード"; a.click();
+});
+
+/* ===== 初期化 ===== */
+$("#roll").addEventListener("click", ()=>roll());
+if($("#daily").checked){ roll(); }
+</script>
+++++
+
