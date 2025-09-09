@@ -5,6 +5,61 @@
 ++++
 <style>
   /* ===== スタイル（#fortune-app 配下に限定） ===== */
+<style id="occult-theme">
+  /* ==== 怪しげダーク上書き ==== */
+  #fortune-app{
+    --bg:#0b0d12; --ink:#e6e6f8; --accent:#7c3aed; --ink-2:#cbd5e1;
+    --muted:#94a3b8; --card:#0f1117; --line:#1e2230;
+  }
+  #fortune-app .wrap{
+    position:relative;
+    background:
+      radial-gradient(1200px 400px at 70% -10%, rgba(124,58,237,.18), transparent 60%),
+      radial-gradient(800px 320px at -10% 120%, rgba(16,185,129,.12), transparent 60%),
+      linear-gradient(180deg,#0b0d12,#0b0d12 60%,#0e1118);
+    border-color:#1e2230; box-shadow:0 14px 40px rgba(0,0,0,.45);
+  }
+  #fortune-app .card{
+    background:rgba(13,16,24,.88); border-color:#1e2230;
+    box-shadow:0 10px 30px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.03);
+    color:var(--ink);
+  }
+  #fortune-app .logo{
+    background:linear-gradient(135deg,#7c3aed,#06b6d4);
+    box-shadow:0 10px 30px rgba(124,58,237,.35);
+  }
+  #fortune-app .badge{ background:rgba(124,58,237,.12); border-color:rgba(124,58,237,.35); color:#c4b5fd }
+  #fortune-app .rank{ text-shadow:0 0 12px rgba(124,58,237,.35) }
+  #fortune-app .msg .k{ background:linear-gradient(transparent 65%, rgba(124,58,237,.25) 0) }
+  #fortune-app .reveal{ background:radial-gradient(900px 200px at 50% -10%, rgba(124,58,237,.25), transparent 60%) }
+
+  /* 霧（ゆっくり揺れる） */
+  #fortune-app .wrap::before{
+    content:""; position:absolute; inset:-20px; pointer-events:none;
+    background:
+      radial-gradient(60% 35% at 20% 0%, rgba(124,58,237,.10), transparent 60%),
+      radial-gradient(60% 35% at 80% 10%, rgba(16,185,129,.08), transparent 60%);
+    filter: blur(10px); animation: drift 12s linear infinite alternate;
+  }
+  @keyframes drift{ from{transform:translateY(-6px)} to{transform:translateY(6px)} }
+
+  /* タイトルを微グリッチ */
+  #fortune-app .title{ position:relative }
+  #fortune-app .title::after{
+    content:attr(data-glitch); position:absolute; inset:0; opacity:.15; pointer-events:none;
+    mix-blend-mode:screen; text-shadow:-1px 0 #7c3aed, 1px 0 #06b6d4;
+    transform:translate(1px,0); animation:glitch 2.2s infinite steps(2,end);
+  }
+  @keyframes glitch{ 50%{ transform:translate(-1px,0) } 100%{ transform:translate(1px,0) } }
+</style>
+<script>
+  // タイトルに data-glitch を一度だけ付与
+  document.addEventListener('DOMContentLoaded',()=>{
+    const t=document.querySelector('#fortune-app .title');
+    if(t && !t.dataset.glitch){ t.dataset.glitch = t.textContent.trim(); }
+  });
+</script>
+
   #fortune-app{--bg:#fff8ef;--ink:#222;--accent:#b91c1c;--ink-2:#444;--muted:#7a7a7a;--ring:rgba(185,28,28,.22);--card:#fff;--line:#eee}
   #fortune-app{font-family: "M PLUS Rounded 1c", "Noto Sans JP", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif}
   #fortune-app .wrap{background:linear-gradient(180deg,#fffaf2 0%,#fff 40%,#fff 100%);border:1px solid #eee;border-radius:18px;padding:18px;box-shadow:0 14px 40px rgba(0,0,0,.07)}
