@@ -92,9 +92,9 @@
 <div id="fortune-app">
   <div class="wrap">
     <div class="head">
-      <div class="logo" aria-hidden>吉</div>
+      <div class="logo" aria-hidden>TRICK</div>
       <div>
-        <h2 class="title">きょうの占い（超凝った版）</h2>
+        <h2 class="title">きょうの占い</h2>
         <p class="subtitle">重み付きの運勢＋カテゴリ別メッセージ／ラッキー情報／画像生成・共有付き</p>
       </div>
     </div>
