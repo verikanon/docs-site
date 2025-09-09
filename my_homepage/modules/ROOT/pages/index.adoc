@@ -43,7 +43,7 @@ Andrew Lab へようこそ
 [cols="1,1,1", frame=none, grid=none]
 |===
 | image:image1.jpg[width=250,role=thumb] | 研究風景の一枚 | ひとこと：今日もよく混ざった
-| image:fox1.png[赤い目のきつね,640] |   | ひとこと：出番を増やせ
+| image:fox1.png[赤い目のきつね,640] |  image:fox2.png[赤い目のきつね,640]  | ひとこと：出番を増やせ
 |===
 
 [TIP]
