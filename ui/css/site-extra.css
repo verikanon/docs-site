@@ -70,4 +70,56 @@ blockquote{
 pre, code{
   border-radius: 10px;
 }
+/* === Step2: navbar styling === */
+:root{
+  --nav-bg: #0f172a;      /* 濃紺(ほぼ黒) */
+  --nav-fg: #e5e7eb;      /* ライトグレー文字 */
+}
+
+/* ヘッダー: 濃紺 + ふわっと影 + 追従 */
+.navbar{
+  background: var(--nav-bg);
+  position: sticky; top: 0; z-index: 1000;
+  box-shadow: 0 6px 18px rgba(2, 6, 23, .25);
+}
+
+/* ロゴ/項目のベース色とスムーズなアニメーション */
+.navbar .navbar-brand,
+.navbar .navbar-item,
+.navbar .navbar-link{
+  color: var(--nav-fg);
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
+}
+
+/* ホバー時：薄いアクセントの乗算 */
+.navbar .navbar-item:hover,
+.navbar .navbar-link:hover{
+  color: #fff;
+  background: rgba(37, 99, 235, .12); /* var(--brand) を薄く */
+  border-radius: 8px;
+}
+
+/* アクティブ表示：下線で強調 */
+.navbar .navbar-item.is-active,
+.navbar .navbar-link.is-active{
+  color: #fff;
+  box-shadow: inset 0 -2px 0 var(--brand);
+}
+
+/* ドロップダウンの色味を合わせる */
+.navbar-dropdown{
+  background: #0b1220;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,.06);
+}
+.navbar-dropdown .navbar-item{
+  color: var(--nav-fg);
+}
+.navbar-dropdown .navbar-item:hover{
+  color: #fff;
+  background: rgba(37, 99, 235, .12);
+}
+
+/* ハンバーガー(モバイル)の線色 */
+.burger span{ background: var(--nav-fg); }
 
