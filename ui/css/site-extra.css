@@ -132,3 +132,12 @@ pre, code{
 /* スクロール先もヘッダー分ずらす（目次/見出しジャンプ用） */
 html{ scroll-padding-top: var(--header-h); }
 
+/* make hamburger/menu icons visible on dark navbar */
+.navbar .nav-toggle,
+.navbar .navbar-burger {
+  color: #e5e7eb !important;  /* light gray */
+}
+.navbar .nav-toggle:hover,
+.navbar .navbar-burger:hover {
+  background: rgba(255,255,255,.08);
+}
